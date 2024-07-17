@@ -1,0 +1,12 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Users Migration API with swagger docs",
+        "title": "Users Migration",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "host": "localhost:8888",
+    "basePath": "/",
+    "paths": {}
+}
