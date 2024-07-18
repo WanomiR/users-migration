@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"backend/internal/entities"
 	"backend/internal/lib/e"
 	"backend/internal/lib/rr"
 	"backend/internal/service"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -27,29 +29,132 @@ func NewUserControl(service service.UserServicer, readresponder rr.ReadResponder
 	return &UserControl{service: service, readResponder: readresponder}
 }
 
+// CreateUser godoc
+// @Summary create user
+// @Description Create new user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body entities.User true "user data"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400,500 {object} rr.JSONResponse
+// @Router /api/users/0 [post]
 func (u *UserControl) CreateUser(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	var user entities.User
+	if err := u.readResponder.ReadJSON(w, r, &user); err != nil {
+		u.readResponder.WriteJSONError(w, err)
+		return
+	}
+
+	userID, err := u.service.CreateUser(r.Context(), user)
+	if err != nil {
+		u.readResponder.WriteJSONError(w, err, 500)
+		return
+	}
+
+	resp := rr.JSONResponse{
+		Message: fmt.Sprintf("user created with id: %d", userID),
+	}
+
+	u.readResponder.WriteJSON(w, 201, resp)
+
 }
 
+// GetUserById godoc
+// @Summary get user by id
+// @Description Return user provided user id
+// @Tags users
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
+// @Router /api/users/{id} [get]
 func (u *UserControl) GetUserById(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	id := chi.URLParam(r, "id")
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		u.readResponder.WriteJSONError(w, e.WrapIfErr("error parsing url param", err))
+		return
+	}
+
+	user, err := u.service.GetUserByID(r.Context(), userId)
+	if err != nil {
+		u.readResponder.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{
+		Message: "user found",
+		Data:    user,
+	}
+
+	u.readResponder.WriteJSON(w, http.StatusOK, resp)
 }
 
+// UpdateUser godoc
+// @Summary update user
+// @Description Update user data provided user id
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body entities.User true "user data"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
+// @Router /api/users/{id} [post]
 func (u *UserControl) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	var user entities.User
+	if err := u.readResponder.ReadJSON(w, r, &user); err != nil {
+		u.readResponder.WriteJSONError(w, err)
+		return
+	}
+
+	err := u.service.UpdateUser(r.Context(), user)
+	if err != nil {
+		u.readResponder.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{
+		Message: "user updated",
+	}
+
+	u.readResponder.WriteJSON(w, http.StatusOK, resp)
 }
 
+// DeleteUser godoc
+// @Summary delete user
+// @Description Delete user provided user id
+// @Tags users
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
+// @Router /api/users/{id} [delete]
 func (u *UserControl) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	id := chi.URLParam(r, "id")
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		u.readResponder.WriteJSONError(w, e.WrapIfErr("error parsing url param", err))
+		return
+	}
+
+	if err = u.service.DeleteUser(r.Context(), userId); err != nil {
+		u.readResponder.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{
+		Message: "user deleted",
+	}
+
+	u.readResponder.WriteJSON(w, http.StatusOK, resp)
 }
 
 // ListUsers godoc
 // @Summary list users
-// @Description list users provided limit and offset
+// @Description Return list of users provided limit and offset
 // @Tags users
 // @Produce json
 // @Param limit query int true "limit"

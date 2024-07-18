@@ -147,8 +147,8 @@ func (a *App) routes() *chi.Mux {
 		r.Get("/", a.controller.ListUsers)
 		r.Post("/0", a.controller.CreateUser)
 		r.Get("/{id}", a.controller.GetUserById)
+		r.Post("/{id}", a.controller.UpdateUser)
 		r.Delete("/{id}", a.controller.DeleteUser)
-		r.Patch("/{id}", a.controller.UpdateUser)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(
