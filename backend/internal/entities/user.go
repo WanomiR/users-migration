@@ -12,9 +12,3 @@ type User struct {
 	UpdatedAt time.Time `json:"-"`
 	IsDeleted bool      `json:"-"`
 }
-
-type ListConditions struct {
-	NUsers int `json:"n_users,int" example:"5" binding:"required"`
-	Limit  int `json:"limit,int" example:"10" binding:"required"`
-	Offset int `json:"offset,int" example:"0" binding:"required"`
-}

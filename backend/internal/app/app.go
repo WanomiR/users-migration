@@ -2,10 +2,11 @@ package app
 
 import (
 	"backend/internal/controller"
+	"backend/internal/lib/e"
+	"backend/internal/lib/rr"
 	"backend/internal/repository"
 	"backend/internal/repository/dbrepo"
 	"backend/internal/service"
-	"backend/internal/utils/readresponder"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -45,10 +46,12 @@ type App struct {
 	controller  controller.UserController
 }
 
-func NewApp() (*App, error) {
-	a := &App{}
+func NewApp() (a *App, err error) {
+	defer func() { err = e.WrapIfErr("failed to init app", err) }()
 
-	if err := a.init(); err != nil {
+	a = &App{}
+
+	if err = a.init(); err != nil {
 		return nil, err
 	}
 
@@ -68,9 +71,15 @@ func (a *App) Signal() <-chan os.Signal {
 	return a.signalChan
 }
 
-func (a *App) readConfig(configPath string) error {
-	if err := godotenv.Load(configPath); err != nil {
-		return err
+func (a *App) readConfig(envPath ...string) (err error) {
+	if len(envPath) > 0 {
+		err = godotenv.Load(envPath[0])
+	} else {
+		err = godotenv.Load()
+	}
+
+	if err != nil {
+		return e.WrapIfErr("can't read .env file", err)
 	}
 
 	a.Port = os.Getenv("PORT")
@@ -87,7 +96,7 @@ func (a *App) readConfig(configPath string) error {
 }
 
 func (a *App) init() error {
-	if err := a.readConfig(".env"); err != nil {
+	if err := a.readConfig(); err != nil {
 		return err
 	}
 
@@ -99,7 +108,7 @@ func (a *App) init() error {
 	a.DB = dbrepo.NewPostgresDBRepo(conn)
 
 	a.userService = service.NewUserService(a.DB)
-	a.controller = controller.NewUserControl(a.userService, readresponder.NewReadRespond())
+	a.controller = controller.NewUserControl(a.userService, rr.NewReadRespond())
 
 	a.server = &http.Server{
 		Addr:         ":" + a.Port,
@@ -114,8 +123,10 @@ func (a *App) init() error {
 	return nil
 }
 
-func (a *App) connectToDB() (*sql.DB, error) {
-	conn, err := sql.Open("pgx", a.DSN)
+func (a *App) connectToDB() (conn *sql.DB, err error) {
+	defer func() { err = e.WrapIfErr("failed to connect to database", err) }()
+
+	conn, err = sql.Open("pgx", a.DSN)
 	if err != nil {
 		return nil, err
 	}
@@ -133,11 +144,11 @@ func (a *App) routes() *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	r.Route("/api/users", func(r chi.Router) {
+		r.Get("/", a.controller.ListUsers)
 		r.Post("/0", a.controller.CreateUser)
 		r.Get("/{id}", a.controller.GetUserById)
 		r.Delete("/{id}", a.controller.DeleteUser)
-		r.Patch("/", a.controller.UpdateUser)
-		r.Post("/", a.controller.ListAllUsers)
+		r.Patch("/{id}", a.controller.UpdateUser)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(

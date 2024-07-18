@@ -19,7 +19,7 @@ func main() {
 
 	a, err := app.NewApp()
 	if err != nil {
-		log.Fatalf("Failed to init app: %v", err.Error())
+		log.Fatal(err)
 	}
 
 	go a.Serve()
@@ -28,7 +28,7 @@ func main() {
 	<-a.Signal()
 
 	// create a context with timeout for graceful shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	// countdown to make graceful shutdown explicit

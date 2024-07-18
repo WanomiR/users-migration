@@ -1,4 +1,4 @@
-package readresponder
+package rr
 
 import (
 	"encoding/json"

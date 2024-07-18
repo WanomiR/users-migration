@@ -1,9 +1,46 @@
 basePath: /
+definitions:
+  rr.JSONResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
 host: localhost:8888
 info:
   contact: {}
   description: Users Migration API with swagger docs
   title: Users Migration
   version: 1.0.0
-paths: {}
+paths:
+  /api/users/:
+    get:
+      description: list users provided limit and offset
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: list users
+      tags:
+      - users
 swagger: "2.0"
