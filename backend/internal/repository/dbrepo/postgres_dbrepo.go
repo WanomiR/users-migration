@@ -63,7 +63,7 @@ func (db *PostgresDBRepo) Create(ctx context.Context, user entities.User) (int, 
 	return userId, nil
 }
 
-func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (*entities.User, error) {
+func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (entities.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
@@ -87,7 +87,7 @@ func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (*entities.User, 
 		return nil, e.WrapIfErr("failed to execute query", err)
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (db *PostgresDBRepo) Update(ctx context.Context, user entities.User) error {
@@ -126,14 +126,14 @@ func (db *PostgresDBRepo) Delete(ctx context.Context, userId int) error {
 	return nil
 }
 
-func (db *PostgresDBRepo) List(ctx context.Context, limit, offset int) ([]*entities.User, error) {
+func (db *PostgresDBRepo) List(ctx context.Context, offset, limit int) ([]entities.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
 	query := `SELECT id, first_name, last_name, email, password, created_at, updated_at, is_deleted 
 				 FROM users LIMIT $1 OFFSET $2`
 
-	var users []*entities.User
+	var users []entities.User
 	rows, err := db.conn.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return nil, e.WrapIfErr("error executing query", err)
@@ -156,7 +156,7 @@ func (db *PostgresDBRepo) List(ctx context.Context, limit, offset int) ([]*entit
 			return nil, e.WrapIfErr("error scanning row", err)
 		}
 
-		users = append(users, &user)
+		users = append(users, user)
 	}
 
 	return users, nil
