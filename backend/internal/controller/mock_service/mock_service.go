@@ -65,10 +65,10 @@ func (mr *MockUserServicerMockRecorder) DeleteUser(ctx, id interface{}) *gomock.
 }
 
 // GetUserByID mocks base method.
-func (m *MockUserServicer) GetUserByID(ctx context.Context, id int) (*entities.User, error) {
+func (m *MockUserServicer) GetUserByID(ctx context.Context, id int) (entities.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByID", ctx, id)
-	ret0, _ := ret[0].(*entities.User)
+	ret0, _ := ret[0].(entities.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockUserServicerMockRecorder) GetUserByID(ctx, id interface{}) *gomock
 }
 
 // GetUsers mocks base method.
-func (m *MockUserServicer) GetUsers(ctx context.Context, limit, offset int) ([]*entities.User, error) {
+func (m *MockUserServicer) GetUsers(ctx context.Context, limit, offset int) ([]entities.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers", ctx, limit, offset)
-	ret0, _ := ret[0].([]*entities.User)
+	ret0, _ := ret[0].([]entities.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
