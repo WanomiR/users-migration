@@ -82,9 +82,9 @@ func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (entities.User, e
 		&user.IsDeleted,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errors.New("user with not found")
+		return entities.User{}, errors.New("user with not found")
 	} else if err != nil {
-		return nil, e.WrapIfErr("failed to execute query", err)
+		return entities.User{}, e.WrapIfErr("failed to execute query", err)
 	}
 
 	return user, nil

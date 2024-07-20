@@ -6,10 +6,10 @@ import (
 	"backend/internal/lib/rr"
 	"backend/internal/service"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type UserController interface {
@@ -36,8 +36,8 @@ func NewUserControl(service service.UserServicer, readresponder rr.ReadResponder
 // @Accept json
 // @Produce json
 // @Param input body entities.User true "user data"
-// @Success 200 {object} rr.JSONResponse
-// @Failure 400,500 {object} rr.JSONResponse
+// @Success 201 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
 // @Router /api/users/0 [post]
 func (u *UserControl) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user entities.User
@@ -48,7 +48,7 @@ func (u *UserControl) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := u.service.CreateUser(r.Context(), user)
 	if err != nil {
-		u.readResponder.WriteJSONError(w, err, 500)
+		u.readResponder.WriteJSONError(w, err)
 		return
 	}
 
@@ -70,7 +70,9 @@ func (u *UserControl) CreateUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} rr.JSONResponse
 // @Router /api/users/{id} [get]
 func (u *UserControl) GetUserById(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	// retrieve url param for user id
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[len(parts)-1]
 
 	userId, err := strconv.Atoi(id)
 	if err != nil {
@@ -132,7 +134,9 @@ func (u *UserControl) UpdateUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} rr.JSONResponse
 // @Router /api/users/{id} [delete]
 func (u *UserControl) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	// retrieve url param for user id
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[len(parts)-1]
 
 	userId, err := strconv.Atoi(id)
 	if err != nil {
