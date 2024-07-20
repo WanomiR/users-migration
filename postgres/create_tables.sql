@@ -93,9 +93,9 @@ COPY public.schema_migrations (version, dirty) FROM stdin;
 --
 
 COPY public.users (id, first_name, last_name, email, password, created_at, updated_at, is_deleted) FROM stdin;
-1	Admin	User	admin@example.com	password	2024-07-16 13:02:26.236168	2024-07-16 13:02:26.236168	f
-2	John	Doe	john@doe.com	string-password	2024-07-16 13:02:26.236168	2024-07-16 13:02:26.236168	f
-3	Jennifer	Lawrence	jen@star.com	secret	2024-07-16 13:02:26.236168	2024-07-16 13:02:26.236168	t
+1	Admin	User	admin@example.com	password	2024-07-17 05:03:27.490254	2024-07-17 05:03:27.490254	f
+2	John	Doe	john@doe.com	string-password	2024-07-17 05:03:27.490254	2024-07-17 05:03:27.490254	f
+3	Jennifer	Lawrence	jen@star.com	secret	2024-07-17 05:03:27.490254	2024-07-17 05:03:27.490254	t
 \.
 
 

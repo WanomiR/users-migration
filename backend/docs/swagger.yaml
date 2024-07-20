@@ -1,0 +1,164 @@
+basePath: /
+definitions:
+  entities.User:
+    properties:
+      email:
+        example: john.smith@gmail.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      id:
+        type: integer
+      last_name:
+        example: Smith
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+  rr.JSONResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: Users Migration API with swagger docs
+  title: Users Migration
+  version: 1.0.0
+paths:
+  /api/users/:
+    get:
+      description: Return list of users provided limit and offset
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: list users
+      tags:
+      - users
+  /api/users/{id}:
+    delete:
+      description: Delete user provided user id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: delete user
+      tags:
+      - users
+    get:
+      description: Return user provided user id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: get user by id
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Update user data provided user id
+      parameters:
+      - description: user data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: update user
+      tags:
+      - users
+  /api/users/0:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: user data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: create user
+      tags:
+      - users
+swagger: "2.0"
