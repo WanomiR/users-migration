@@ -37,6 +37,7 @@ type Server interface {
 }
 
 type App struct {
+	Host	    string
 	Port        string
 	server      *http.Server
 	signalChan  chan os.Signal
@@ -82,6 +83,7 @@ func (a *App) readConfig(envPath ...string) (err error) {
 		return e.WrapIfErr("can't read .env file", err)
 	}
 
+	a.Host = os.Getenv("HOST")
 	a.Port = os.Getenv("PORT")
 	a.DSN = fmt.Sprintf( // database source name
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5\n",
@@ -152,7 +154,7 @@ func (a *App) routes() *chi.Mux {
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", a.Port)),
+		httpSwagger.URL(fmt.Sprintf("http://%s:%s/swagger/doc.json", a.Host, a.Port)),
 	))
 
 	return r
