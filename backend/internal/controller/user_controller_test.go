@@ -177,7 +177,7 @@ func TestUserControl_DeleteUser(t *testing.T) {
 
 func TestUserControl_ListUsers(t *testing.T) {
 	type params struct {
-		limit, offset any
+		offset, limit any
 	}
 	testCases := []struct {
 		name       string
@@ -185,8 +185,8 @@ func TestUserControl_ListUsers(t *testing.T) {
 		wantStatus int
 	}{
 		{"normal case", params{0, 1}, 200},
-		{"bad limit param", params{"q068", 1}, 400},
-		{"bad offset param", params{1, "?"}, 400},
+		{"bad offset param", params{"q068", 1}, 400},
+		{"bad limit param", params{1, "?"}, 400},
 		{"bigger limit", params{0, 3}, 200},
 		{"too small limit", params{0, 0}, 400},
 		{"offset and limit on the edge", params{2, 3}, 200},
@@ -215,6 +215,7 @@ func TestUserControl_ListUsers(t *testing.T) {
 			defer r.Body.Close()
 
 			if r.StatusCode != tc.wantStatus {
+				fmt.Println(resp.Message)
 				t.Errorf("ListUsers(), expected status %d, got %d", tc.wantStatus, r.StatusCode)
 			}
 		})

@@ -9,7 +9,7 @@ import (
 )
 
 type UserServicer interface {
-	GetUsers(ctx context.Context, limit, offset int) ([]entities.User, error)
+	GetUsers(ctx context.Context, offset, limit int) ([]entities.User, error)
 	GetUserByID(ctx context.Context, id int) (entities.User, error)
 	CreateUser(ctx context.Context, user entities.User) (int, error)
 	DeleteUser(ctx context.Context, id int) error

@@ -181,7 +181,7 @@ func (u *UserControl) ListUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := u.service.GetUsers(r.Context(), limit, offset)
+	users, err := u.service.GetUsers(r.Context(), offset, limit)
 	if err != nil {
 		u.readResponder.WriteJSONError(w, err)
 		return
