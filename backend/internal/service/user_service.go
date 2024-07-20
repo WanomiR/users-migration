@@ -51,10 +51,6 @@ func (u *UserService) GetUserByID(ctx context.Context, id int) (entities.User, e
 		return entities.User{}, e.WrapIfErr("failed to get user", err)
 	}
 
-	if user.IsDeleted {
-		return entities.User{}, e.WrapIfErr("failed to get user", errors.New("user not found"))
-	}
-
 	return user, nil
 }
 
@@ -78,14 +74,8 @@ func (u *UserService) CreateUser(ctx context.Context, user entities.User) (int, 
 func (u *UserService) DeleteUser(ctx context.Context, userId int) (err error) {
 	defer func() { err = e.WrapIfErr("failed to delete user", err) }()
 
-	var user entities.User
-	user, err = u.DB.GetByID(ctx, userId)
-	if err != nil {
+	if _, err = u.DB.GetByID(ctx, userId); err != nil {
 		return err
-	}
-
-	if user.IsDeleted {
-		return errors.New("user not found")
 	}
 
 	if err = u.DB.Delete(ctx, userId); err != nil {
@@ -98,14 +88,8 @@ func (u *UserService) DeleteUser(ctx context.Context, userId int) (err error) {
 func (u *UserService) UpdateUser(ctx context.Context, userInput entities.User) (err error) {
 	defer func() { err = e.WrapIfErr("failed to update user", err) }()
 
-	var user entities.User
-	user, err = u.DB.GetByID(ctx, userInput.Id)
-	if err != nil {
+	if _, err = u.DB.GetByID(ctx, userInput.Id); err != nil {
 		return err
-	}
-
-	if user.IsDeleted {
-		return errors.New("user not found")
 	}
 
 	if err = u.DB.Update(ctx, userInput); err != nil {

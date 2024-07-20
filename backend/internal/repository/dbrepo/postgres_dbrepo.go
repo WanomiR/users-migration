@@ -68,7 +68,8 @@ func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (entities.User, e
 	defer cancel()
 
 	query := `SELECT id, first_name, last_name, email, password, created_at, updated_at, is_deleted 
-				 FROM users WHERE id = $1`
+				 FROM users 
+				 WHERE id = $1 AND is_deleted = FALSE`
 
 	var user entities.User
 	err := db.conn.QueryRowContext(ctx, query, id).Scan(
@@ -82,7 +83,7 @@ func (db *PostgresDBRepo) GetByID(ctx context.Context, id int) (entities.User, e
 		&user.IsDeleted,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return entities.User{}, errors.New("user with not found")
+		return entities.User{}, errors.New("user not found")
 	} else if err != nil {
 		return entities.User{}, e.WrapIfErr("failed to execute query", err)
 	}
@@ -131,7 +132,9 @@ func (db *PostgresDBRepo) List(ctx context.Context, offset, limit int) ([]entiti
 	defer cancel()
 
 	query := `SELECT id, first_name, last_name, email, password, created_at, updated_at, is_deleted 
-				 FROM users LIMIT $1 OFFSET $2`
+				 FROM users 
+				 WHERE is_deleted = FALSE
+				 LIMIT $1 OFFSET $2`
 
 	var users []entities.User
 	rows, err := db.conn.QueryContext(ctx, query, limit, offset)

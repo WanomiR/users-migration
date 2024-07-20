@@ -174,6 +174,10 @@ func NewMockRepository(controller *gomock.Controller) *mock_repository.MockUserR
 		if id < 1 || id > 4 {
 			return entities.User{}, e.WrapIfErr("failed to get user", errors.New("user not found"))
 		}
+
+		if user := mockUsers[id-1]; user.IsDeleted {
+			return entities.User{}, e.WrapIfErr("failed to get user", errors.New("user not found"))
+		}
 		return mockUsers[id-1], nil
 	}).AnyTimes()
 
@@ -182,9 +186,6 @@ func NewMockRepository(controller *gomock.Controller) *mock_repository.MockUserR
 	}).AnyTimes()
 
 	mockDb.EXPECT().Delete(gomock.Any(), gomock.Any()).DoAndReturn(func(_ context.Context, id int) error {
-		if id < 1 || id > 4 {
-			return e.WrapIfErr("failed to delete user", errors.New("user not found"))
-		}
 		return nil
 	}).AnyTimes()
 
